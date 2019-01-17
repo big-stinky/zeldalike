@@ -1,10 +1,11 @@
-import random, math, pygame
+import pygame
+
 from pygame.locals import *
+from pygame.sprite import Group
+
+import actor
 
 def main():
-	"This is the starfield code"
-	#create our starfield
-	random.seed()
 	clock = pygame.time.Clock()
 
 	#initialize and prepare screen
@@ -12,21 +13,30 @@ def main():
 	screen = pygame.display.set_mode((800, 600))
 	pygame.display.set_caption("Zeldalike")
 	
-	white = 255, 240, 200
-	black = 20, 20, 40
-	
-	screen.fill(black)
+	black = 0, 0, 0
+
+	sprites = Group()
+
+	player = actor.Actor()
+
+	sprites.add(player)
 
 	#main game loop
 	done = False
 	while not done:
-		pygame.draw.rect(screen, white, pygame.Rect(0, 0, 40, 30))
-		pygame.display.update()
+		screen.fill(black)
+		sprites.draw(screen)
+
+		pygame.display.flip()
 
 		for e in pygame.event.get():
 			if e.type == QUIT or (e.type == KEYUP and e.key == K_ESCAPE):
-				done = 1
+				done = True
 				break
+
+			if e.type == KEYUP:
+				if e.key == K_RIGHT:
+					player.rect.x += 10
 		
 		clock.tick(60)
 
