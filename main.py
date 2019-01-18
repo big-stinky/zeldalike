@@ -3,11 +3,11 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 
-import Player
+import Player, wall
 
 mapArea = [800,600]
 width = mapArea[0]
-height = mapArea[1] -1
+height = mapArea[1]
 
 def main():
 	clock = pygame.time.Clock()
@@ -21,11 +21,14 @@ def main():
 
 	#creates a group
 	sprites = Group()
-
 	player = Player.Player()
+	sprites.add(player)
+
+	walls = Group()
+	newWall = wall.Wall(150,200,50,20,(255,255,0))
+	walls.add(newWall)
 
 	#adds player to the sprites group
-	sprites.add(player)
 
 	#main game loop
 	done = False
@@ -33,6 +36,7 @@ def main():
 		clock.tick(60)
 		screen.fill(black)
 		sprites.draw(screen)
+		walls.draw(screen)
 
 		#basic event if statement block
 		for event in pygame.event.get():
@@ -62,7 +66,7 @@ def main():
 					player.move(0,-2)
 				
 		
-		player.update([width,height])
+		player.update([width,height],walls)
 
 		pygame.display.flip()
 
