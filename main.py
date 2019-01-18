@@ -17,7 +17,7 @@ def main():
 
 	sprites = Group()
 
-	player = actor.Actor()
+	player = Player.Player()
 
 	sprites.add(player)
 
