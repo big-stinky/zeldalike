@@ -3,7 +3,7 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 
-import actor
+import Player
 
 def main():
 	clock = pygame.time.Clock()
