@@ -3,22 +3,28 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 
-import actor
+import Player
+
+mapArea = [800,600]
+width = mapArea[0]
+height = mapArea[1] -1
 
 def main():
 	clock = pygame.time.Clock()
 
 	#initialize and prepare screen
 	pygame.init()
-	screen = pygame.display.set_mode((800, 600))
+	screen = pygame.display.set_mode((mapArea[0], mapArea[1]))
 	pygame.display.set_caption("Zeldalike")
 	
 	black = 0, 0, 0
 
+	#creates a group
 	sprites = Group()
 
-	player = actor.Actor()
+	player = Player.Player()
 
+	#adds player to the sprites group
 	sprites.add(player)
 
 	#main game loop
@@ -28,7 +34,7 @@ def main():
 		screen.fill(black)
 		sprites.draw(screen)
 
-
+		#basic event if statement block
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
 				done = True
@@ -56,7 +62,7 @@ def main():
 					player.move(0,-2)
 				
 		
-		player.update()
+		player.update([width,height])
 
 		pygame.display.flip()
 
