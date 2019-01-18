@@ -25,13 +25,13 @@ class Pack:
 
 		self.decay = 0
 
-		self.wanted_veg = 1
-		self.wanted_trees = 0
+		self.wantedVeg = 1
+		self.wantedTrees = 0
 
 		self.dead = False
 
 	def update(self, world):
-		if not self.conditions_good():
+		if not self.conditionsGood():
 			self.move(world)
 
 			self.decay += 1
@@ -42,32 +42,32 @@ class Pack:
 
 		self.dead = self.size < 1
 
-	def conditions_good(self):
-		biome = world.get_biome(self.x, self.y)
+	def conditionsGood(self):
+		biome = world.getBiome(self.x, self.y)
 
-		return biome.veg >= self.wanted_veg and biome.trees >= self.wanted_trees
+		return biome.veg >= self.wantedVeg and biome.trees >= self.wantedTrees
 
 	def move(self, world):
-		x_min = 0
-		x_max = 0
+		xMin = 0
+		xMax = 0
 
-		y_min = 0
-		y_max = 0
+		yMin = 0
+		yMax = 0
 
 		if self.x > 0:
-			x_min = -1
+			xMin = -1
 
 		if self.x < len(world.map[0])-1:
-			x_max = 2
+			xMax = 2
 
 		if self.y > 0:
-			y_min = -1
+			yMin = -1
 
 		if self.y < len(world.map)-1:
-			y_max = 2
+			yMax = 2
 
-		self.x += random.choice(range(x_min, x_max))
-		self.y += random.choice(range(y_min, y_max))
+		self.x += random.choice(range(xMin, xMax))
+		self.y += random.choice(range(yMin, yMax))
 
 
 class World:
@@ -87,11 +87,11 @@ class World:
 		self.packs = [pack for pack in self.packs if not pack.dead]
 
 		for pack in self.packs:
-			biome = self.get_biome(pack.x, pack.y)
+			biome = self.getBiome(pack.x, pack.y)
 	
 			if pack.packType == packTypes["DEER"]:
-				if biome.veg >= pack.wanted_veg * pack.size:
-					biome.veg -= pack.wanted_veg * pack.size
+				if biome.veg >= pack.wantedVeg * pack.size:
+					biome.veg -= pack.wantedVeg * pack.size
 	
 				else:
 					biome.veg = 0
@@ -122,7 +122,7 @@ class World:
 					print(" ", end = "")
 		print()
 
-	def get_biome(self, findX, findY):
+	def getBiome(self, findX, findY):
 		for y in range(0, len(self.map)):
 			for x in range(0, len(self.map[y])):
 				if (x, y) == (findX, findY):
