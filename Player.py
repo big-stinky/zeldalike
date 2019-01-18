@@ -23,13 +23,14 @@ class Player(pygame.sprite.Sprite):
 
 	#called on every clock cycle, changes the characters position based on velocity
 	#also handles boundaries
-	def update(self,mapArea):
+	def update(self,mapArea,wallList):
 		xOld = self.rect[0]
 		xNew = xOld+self.xVelocity
 		self.rect[0] = xNew
 
 		#checks if collided with walls or map edges
-		if (xNew >= mapArea[0]-self.rect[2] or xNew <= 0):
+		collide = pygame.sprite.spritecollide(self, wallList, False)
+		if (collide or xNew >= mapArea[0]-self.rect[2] or xNew <= 0):
 			self.rect[0] = xOld
 			
 
@@ -39,6 +40,7 @@ class Player(pygame.sprite.Sprite):
 		self.rect[1] = yNew
 
 		#checks if collided with walls or map edges
-		if (yNew >= (mapArea[1]-self.rect[3]) or yNew <= 0):
+		collide = pygame.sprite.spritecollide(self, wallList, False)
+		if (collide or yNew >= (mapArea[1]-self.rect[3]) or yNew <= 0):
 			self.rect[1] = yOld
 
