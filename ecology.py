@@ -2,16 +2,13 @@ import random
 
 #TODO: saturation for wolves
 
-packTypes = {
-	"DEER": 0,
-	"WOLF": 1,
-}
-
 class Biome:
 	def __init__(self, veg, trees):
 		self.veg = veg
 		self.trees = trees
 		self.meat = 0
+
+		self.debug = False
 
 class Pack:
 	def __init__(self, name, x, y, size, packType):
@@ -85,42 +82,66 @@ class World:
 			pack.update(self)
 
 		self.packs = [pack for pack in self.packs if not pack.dead]
+		
+		for y in range(0, len(self.map)):
+			for x in range(0, len(self.map[y])):
+				biome = self.map[y][x]
 
-		for pack in self.packs:
-			biome = self.getBiome(pack.x, pack.y)
+				biome.meat = 0
+
+				for pack in self.packs:
+					if (pack.x, pack.y) == (x, y):
+						if pack.packType in ["DEER", "WOLF"]:
+							biome.meat += pack.size
 	
-			if pack.packType == packTypes["DEER"]:
-				if biome.veg >= pack.wantedVeg * pack.size:
-					biome.veg -= pack.wantedVeg * pack.size
-	
-				else:
-					biome.veg = 0
+						if pack.packType == "DEER":
+							if biome.veg >= pack.wantedVeg * pack.size:
+								biome.veg -= pack.wantedVeg * pack.size
+				
+							else:
+								biome.veg = 0
 
 	def print(self):
+		strings = ["" for i in range(len(self.map)+1)]
+
+		strings[0] += " "
+
+		for i in range(0, len(self.map)):
+			strings[0] += "  {}".format(i)
+
+		print(strings)
+
 		for y in range(0, len(self.map)):
-			print("")
+			strings[y+1] += "{}) ".format(y)
+			
 			for x in range(0, len(self.map[y])):
-				for pack in self.packs:
-					if pack.x == x and pack.y == y:
-						if pack.packType == packTypes["DEER"]:
-							print("DD ", end = "")
-							break
 
+				if self.map[y][x].debug:
+					strings[y+1] += "!! "
 				else:
-					if self.map[y][x].veg > 0:
-						print("V", end = "")
+					for pack in self.packs:
+						if pack.x == x and pack.y == y:
+							if pack.packType == "DEER":
+								strings[y+1] += "DD"
+								break
 
 					else:
-						print(" ", end = "")
+						if self.map[y][x].veg > 0:
+							strings[y+1] += "V"
+	
+						else:
+							strings[y+1] += " "
+	
+						if self.map[y][x].trees > 0:
+							strings[y+1] += "T"
+	
+						else:
+							strings[y+1] += " "
 
-					if self.map[y][x].trees > 0:
-						print("T", end = "")
-
-					else:
-						print(" ", end = "")
-
-					print(" ", end = "")
-		print()
+					strings[y+1] += " "
+		
+		for string in strings:
+			print(string)
 
 	def getBiome(self, findX, findY):
 		for y in range(0, len(self.map)):
@@ -131,12 +152,12 @@ class World:
 		return False
 
 world = World()
-deer = Pack("Deer", 0, 0, 10, packTypes["DEER"])
+deer = Pack("Deer", 0, 0, 10, "DEER")
 world.packs.append(deer)
 
 while True:	
+	world.update()
 	world.print()
+	print(world.getBiome(deer.x, deer.y).meat)
 
 	inp = input(">")
-	
-	world.update()
