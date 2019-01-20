@@ -102,43 +102,49 @@ class World:
 								biome.veg = 0
 
 	def print(self):
-		strings = ["" for i in range(len(self.map)+1)]
+		base = 2
 
-		strings[0] += " "
+		strings = ["" for i in range(len(self.map)+base)]
+
+		strings[0] += "   "
 
 		for i in range(0, len(self.map)):
 			strings[0] += "  {}".format(i)
 
-		print(strings)
+		strings[1] = "  +" + ("-" * (len(strings[0]) - 1))
 
 		for y in range(0, len(self.map)):
-			strings[y+1] += "{}) ".format(y)
+			strings[y+base] += "{} | ".format(y)
 			
 			for x in range(0, len(self.map[y])):
 
 				if self.map[y][x].debug:
-					strings[y+1] += "!! "
+					strings[y+base] += "!! "
 				else:
 					for pack in self.packs:
 						if pack.x == x and pack.y == y:
 							if pack.packType == "DEER":
-								strings[y+1] += "DD"
+								strings[y+base] += "DD"
+								break
+
+							elif pack.packType == "WOLF":
+								strings[y+base] += "WW"
 								break
 
 					else:
 						if self.map[y][x].veg > 0:
-							strings[y+1] += "V"
+							strings[y+base] += "V"
 	
 						else:
-							strings[y+1] += " "
+							strings[y+base] += " "
 	
 						if self.map[y][x].trees > 0:
-							strings[y+1] += "T"
+							strings[y+base] += "T"
 	
 						else:
-							strings[y+1] += " "
+							strings[y+base] += " "
 
-					strings[y+1] += " "
+					strings[y+base] += " "
 		
 		for string in strings:
 			print(string)
