@@ -1,6 +1,8 @@
 import random
 
 #TODO: saturation for wolves
+#TODO: deer on deer = light fight, join up or ignore
+#
 
 class Biome:
 	def __init__(self, veg, trees):
@@ -101,6 +103,28 @@ class World:
 							else:
 								biome.veg = 0
 
+		have_interacted = []
+
+		for pack in self.packs:
+			for otherPack in self.packs:
+				if (pack.x, pack.y) == (otherPack.x, otherPack.y) and pack != otherPack and not (pack, otherPack):
+					if pack.packType == "DEER":
+						if otherPack.packType == "DEER":
+							print("YAH YEET")
+		
+							roll = random.randrange(0, 101)
+							
+							if roll >= 0 and roll <= 33:
+								otherPack.size -= random.randrange(1, 3)
+							
+							elif roll > 33 or roll <= 66:
+								print("ignore")
+							
+							else:
+								print("join")
+
+
+
 	def print(self):
 		base = 2
 
@@ -159,7 +183,9 @@ class World:
 
 world = World()
 deer = Pack("Deer", 0, 0, 10, "DEER")
+deer2 = Pack("Deer", 0, 0, 10, "DEER")
 world.packs.append(deer)
+world.packs.append(deer2)
 
 while True:	
 	world.update()
