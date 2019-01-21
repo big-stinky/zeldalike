@@ -1,7 +1,10 @@
 import pygame
 
 class Player(pygame.sprite.Sprite):
-	#initialize the player
+
+	#--------------------------------------------------------------------------
+	# Initializes the player, and sets their size, and starting points etc.
+	#--------------------------------------------------------------------------
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
 
@@ -16,30 +19,35 @@ class Player(pygame.sprite.Sprite):
 		self.rect[0] = 10
 		self.rect[1] = 10
 
-	#function to set the players velocity
+	#--------------------------------------------------------------------------
+	# Method to change players velocity
+	#--------------------------------------------------------------------------
 	def move(self, xVel, yVel):
 		self.xVelocity += xVel
 		self.yVelocity += yVel
 
-	#called on every clock cycle, changes the characters position based on velocity
-	#also handles boundaries
+	#--------------------------------------------------------------------------
+	# Called on every clock cycle, changes the characters position based on
+	# Their velocity, also handles the map boundaries
+	#--------------------------------------------------------------------------
 	def update(self,mapArea,wallList):
+		# X variables movement
 		xOld = self.rect[0]
 		xNew = xOld+self.xVelocity
 		self.rect[0] = xNew
 
-		#checks if collided with walls or map edges
+		# Checks if collided with walls or map edges
 		collide = pygame.sprite.spritecollide(self, wallList, False)
 		if (collide or xNew >= mapArea[0]-self.rect[2] or xNew <= 0):
 			self.rect[0] = xOld
 			
 
-		#y variable movement
+		# Y variable movement
 		yOld = self.rect[1]
 		yNew = yOld+self.yVelocity
 		self.rect[1] = yNew
 
-		#checks if collided with walls or map edges
+		# Checks if collided with walls or map edges
 		collide = pygame.sprite.spritecollide(self, wallList, False)
 		if (collide or yNew >= (mapArea[1]-self.rect[3]) or yNew <= 0):
 			self.rect[1] = yOld
