@@ -1,8 +1,6 @@
 import random
 
 #TODO: saturation for wolves
-#TODO: deer on deer = light fight, join up or ignore
-#
 
 class Biome:
 	def __init__(self, veg, trees):
@@ -20,18 +18,31 @@ class Pack:
 		self.y = y
 
 		self.size = size
-		self.packType = packType
 
 		self.decay = 0
 
+		#basically the animal species
+		self.packType = packType
+
+		#wanted veg and trees in a biome
 		self.wantedVeg = 1
 		self.wantedTrees = 0
+
+		#will this creature fight members of other packs with same PACKTYPE?
+		self.fightsFriend = True
+
+		#provides meat means it gives meat to the biome per member
+		self.providesMeat = 1
+		
+		self.aggression = 10
+		self.fear = 60
 
 		self.dead = False
 
 	def update(self, world):
 		if not self.conditionsGood():
 			self.move(world)
+			print("{} uh oh".format(self.name))
 
 			self.decay += 1
 
@@ -93,10 +104,11 @@ class World:
 
 				for pack in self.packs:
 					if (pack.x, pack.y) == (x, y):
-						if pack.packType in ["DEER", "WOLF"]:
-							biome.meat += pack.size
+						if pack.providesMeat > 0:
+							biome.meat += pack.size * pack.providesMeat
 	
-						if pack.packType == "DEER":
+							print("{}: v{}, w{}".format(pack.name, biome.veg, pack.wantedVeg * pack.size))
+
 							if biome.veg >= pack.wantedVeg * pack.size:
 								biome.veg -= pack.wantedVeg * pack.size
 				
@@ -105,91 +117,101 @@ class World:
 
 		have_interacted = []
 
+		#Interactions
+		#Fight, Fight = both sides lose members
+		#run, Fight = run loses members
+		#run, run = nothing occurs, both packs leave. based on aggression
+
 		for pack in self.packs:
 			for otherPack in self.packs:
-				if (pack.x, pack.y) == (otherPack.x, otherPack.y) and pack != otherPack and not (pack, otherPack):
-					if pack.packType == "DEER":
-						if otherPack.packType == "DEER":
-							print("YAH YEET")
-		
-							roll = random.randrange(0, 101)
-							
-							if roll >= 0 and roll <= 33:
-								otherPack.size -= random.randrange(1, 3)
-							
-							elif roll > 33 or roll <= 66:
-								print("ignore")
-							
-							else:
-								print("join")
+				if (pack.x, pack.y) == (otherPack.x, otherPack.y) and pack != otherPack and not (otherPack, pack) in have_interacted:
+					have_interacted.append((pack, otherPack))
 
+					pack_fight = random.randrange(0, pack.aggression)
+					otherPack_fight = random.randrange(0, otherPack.aggression)
 
+					pack_run = random.randrange(0, pack.fear + otherPack.aggression)
+					otherPack_run = random.randrange(0, otherPack.fear + pack.aggression)
+
+					#pack devision
+					if pack_fight > pack_run:
+						otherPack.size -= random.randrange(1, 3)
+						print("FIGHT: {}, {}".format(pack.name, otherPack.name))
+
+					elif pack_run > pack_fight:
+						pack.move(self)
+						print("RUN: {}".format(pack.name))
+
+					#other pack decision
+					if otherPack_fight > otherPack_run:
+						pack.size -= random.randrange(1, 3)
+						print("FIGHT: {}, {}".format(otherPack.name, pack.name))
+
+					elif otherPack_run > otherPack_fight:
+						pack.move(self)
+						print("RUN: {}".format(otherPack.name))
 
 	def print(self):
-		base = 2
+		strings = [[] for i in range(len(self.map))]
 
-		strings = ["" for i in range(len(self.map)+base)]
-
-		strings[0] += "   "
-
-		for i in range(0, len(self.map)):
-			strings[0] += "  {}".format(i)
-
-		strings[1] = "  +" + ("-" * (len(strings[0]) - 1))
-
-		for y in range(0, len(self.map)):
-			strings[y+base] += "{} | ".format(y)
-			
+		for y in range(0, len(self.map)):			
 			for x in range(0, len(self.map[y])):
 
 				if self.map[y][x].debug:
-					strings[y+base] += "!! "
+					strings[y].append("!!")
 				else:
 					for pack in self.packs:
 						if pack.x == x and pack.y == y:
 							if pack.packType == "DEER":
-								strings[y+base] += "DD"
+								strings[y].append("DD")
 								break
 
 							elif pack.packType == "WOLF":
-								strings[y+base] += "WW"
+								strings[y].append("WW")
 								break
 
 					else:
+						string = ""
 						if self.map[y][x].veg > 0:
-							strings[y+base] += "V"
-	
+							string += "V"
+
 						else:
-							strings[y+base] += " "
+							string += " "
 	
 						if self.map[y][x].trees > 0:
-							strings[y+base] += "T"
+							string += "T"
 	
 						else:
-							strings[y+base] += " "
-
-					strings[y+base] += " "
+							string += " "
 		
-		for string in strings:
-			print(string)
+						strings[y].append(string)
+
+		for row in strings:
+			for biome in row:
+				print(biome + " ", end = "")
+
+			print("")
 
 	def getBiome(self, findX, findY):
-		for y in range(0, len(self.map)):
-			for x in range(0, len(self.map[y])):
-				if (x, y) == (findX, findY):
-					return self.map[y][x]
-
-		return False
+		return self.map[findY][findX]
 
 world = World()
-deer = Pack("Deer", 0, 0, 10, "DEER")
-deer2 = Pack("Deer", 0, 0, 10, "DEER")
+deer = Pack("Deer1", 0, 0, 10, "DEER")
+deer2 = Pack("Deer2", 0, 0, 10, "DEER")
 world.packs.append(deer)
 world.packs.append(deer2)
 
 while True:	
 	world.update()
 	world.print()
+
+	#for y in world:
+	#	for x in world[y]:
+	#		blit(rect(y * 20, x * 20, 20, 20))
+#
+	#for pack in worlds.pack:
+	#	blit(rect(pack.x * 20, pack.y * 20, 20, 20))
+
 	print(world.getBiome(deer.x, deer.y).meat)
 
 	inp = input(">")
